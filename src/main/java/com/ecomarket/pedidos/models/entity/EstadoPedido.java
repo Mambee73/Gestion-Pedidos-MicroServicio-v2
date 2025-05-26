@@ -1,6 +1,6 @@
-package com.ecomarket.pedidos.models;
+package com.ecomarket.pedidos.models.entity;
 
-public enum EstadoOrden {
+public enum EstadoPedido {
     PENDIENTE,
     CONFIRMADA,
     ENVIADA,
