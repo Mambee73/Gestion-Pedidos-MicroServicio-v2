@@ -11,7 +11,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CrearPedidoDTO {
+public class CrearPedidoSolicitudDTO {
 
     @NotNull(message = "El ID del cliente no puede ser nulo.")
     private Long clienteId;

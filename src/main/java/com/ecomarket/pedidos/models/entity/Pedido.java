@@ -59,4 +59,9 @@ public class Pedido {
             item.setPedido(null);
         }
     }
+
+    public void setMontoTotal(double montoTotalCalculado) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setMontoTotal'");
+    }
 }
