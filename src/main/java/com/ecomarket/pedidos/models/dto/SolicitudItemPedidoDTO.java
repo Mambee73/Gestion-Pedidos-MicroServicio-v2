@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemPedidoSolicitudDTO {
+public class SolicitudItemPedidoDTO {
 
     @NotNull(message = "El ID del producto no puede ser nulo.")
     private Long productoId;

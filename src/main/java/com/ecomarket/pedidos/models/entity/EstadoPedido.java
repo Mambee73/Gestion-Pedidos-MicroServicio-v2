@@ -5,5 +5,5 @@ public enum EstadoPedido {
     CONFIRMADA,
     ENVIADA,
     ENTREGADA,
-    CANCELADA
+    CANCELADA, PROCESANDO
 }

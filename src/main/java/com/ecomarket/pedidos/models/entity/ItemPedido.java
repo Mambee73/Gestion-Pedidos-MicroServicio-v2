@@ -32,11 +32,11 @@ public class ItemPedido {
 
     @NotNull(message = "El precio al comprar no puede ser nulo.")
     @Column(nullable = false)
-    private Double precioAlComprar;
+    private long precioAlComprar;
 
     @NotNull(message = "El subtotal no puede ser nulo.")
     @Column(nullable = false)
-    private Double subTotal;
+    private long subTotal;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pedido_id", nullable = false)

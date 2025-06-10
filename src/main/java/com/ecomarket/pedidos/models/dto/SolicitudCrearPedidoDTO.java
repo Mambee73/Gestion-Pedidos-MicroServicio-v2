@@ -11,17 +11,17 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class CrearPedidoDTO {
+public class SolicitudCrearPedidoDTO {
 
     @NotNull(message = "El ID del cliente no puede ser nulo.")
     private Long clienteId;
 
     @NotNull(message = "La dirección de envío no puede ser nula.")
     @Valid 
-    private DireccionEnvioDTO direccionEnvio;
+    private DireccionDTO direccionEnvio;
 
     @NotEmpty(message = "La lista de ítems del pedido no puede estar vacía.")
     @Valid 
-    private List<ItemPedidoSolicitudDTO> items;
+    private List<SolicitudItemPedidoDTO> items;
 }
 
