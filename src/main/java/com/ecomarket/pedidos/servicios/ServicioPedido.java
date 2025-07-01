@@ -1,61 +1,60 @@
 package com.ecomarket.pedidos.servicios;
 
-import com.ecomarket.pedidos.excepcion.ExcepcionPedidoNoEncontrado;
-import com.ecomarket.pedidos.models.entity.Pedido;
+import com.ecomarket.pedidos.models.dto.RespuestaPedidoDTO;
+import com.ecomarket.pedidos.models.dto.RespuestaResumenPedidoDTO;
+import com.ecomarket.pedidos.models.dto.SolicitudCrearPedidoDTO;
+import com.ecomarket.pedidos.models.entity.EstadoPedido;
 import com.ecomarket.pedidos.repositorios.RepositorioPedido;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
-public class ServicioPedido {
+@RequiredArgsConstructor
+public class ServicioPedido implements InterfazServicioPedido {
 
-    private static final Logger logger = LoggerFactory.getLogger(ServicioPedido.class);
+    // Inyectamos las dependencias que necesitamos para trabajar
+    private final RepositorioPedido Repositoriopedido;
+    // Más adelante crearemos este Mapper para las conversiones
+    // private final PedidoMapper pedidoMapper; 
 
-    private final RepositorioPedido repositorioPedido;
-
-    @Autowired
-    public ServicioPedido(RepositorioPedido repositorioPedido) {
-        this.repositorioPedido = repositorioPedido;
-    }
-
+    @Override
     @Transactional
-    public Pedido crear_ActualizarPedido(Pedido pedido) {
-        logger.info("Servicio: Guardando pedido para cliente ID: {}", pedido.getClienteId());
-        return repositorioPedido.save(pedido);
+    public RespuestaPedidoDTO crearPedido(SolicitudCrearPedidoDTO solicitud) {
+        // TODO: Implementar la lógica para crear un pedido.
+        // 1. Convertir DTO a Entidad.
+        // 2. Realizar cálculos (monto total).
+        // 3. Guardar en la BD usando el repositorio.
+        // 4. Convertir la Entidad guardada a DTO de respuesta.
+        return null; 
     }
 
+    @Override
     @Transactional(readOnly = true)
-    public List<Pedido> obtenerTodosLosPedidos() {
-        logger.info("Servicio: Obteniendo todos los pedidos.");
-        return repositorioPedido.findAll();
+    public RespuestaPedidoDTO obtenerPedidoPorId(Long id) {
+        // TODO: Implementar la lógica para buscar un pedido.
+        return null;
     }
 
+    @Override
     @Transactional(readOnly = true)
-    public Optional<Pedido> obtenerPedidoPorId(Long id) {
-        logger.info("Servicio: Obteniendo pedido con ID: {}", id);
-        return repositorioPedido.findById(id);
+    public List<RespuestaResumenPedidoDTO> obtenerPedidosPorClienteId(Long clienteId) {
+        // TODO: Implementar la lógica.
+        return null;
     }
 
+    @Override
+    @Transactional
+    public RespuestaPedidoDTO actualizarEstado(Long id, EstadoPedido nuevoEstado) {
+        // TODO: Implementar la lógica.
+        return null;
+    }
+
+    @Override
     @Transactional
     public void eliminarPedido(Long id) {
-        logger.info("Servicio: Eliminando pedido con ID: {}", id);
-            if (!repositorioPedido.existsById(id)) {
-                throw new ExcepcionPedidoNoEncontrado("Pedido no encontrado con ID: " + id);
-            }
-        repositorioPedido.deleteById(id);
-        logger.info("Pedido ID {} eliminado (si existía).", id);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Pedido> obtenerPedidosPorClienteId(Long clienteId) {
-        logger.info("Servicio: Buscando pedidos para el cliente ID: {}", clienteId);
-        return this.repositorioPedido.findByClienteIdOrderByFechaPedidoDesc(clienteId);
+        // TODO: Implementar la lógica.
     }
 }
