@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,12 +38,12 @@ public class Pedido {
 
     @NotNull(message = "El monto total no puede ser nulo.")
     @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal montoTotal;
+    private long montoTotal;
 
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY) //????
     private List<ItemPedido> itemsPedido = new ArrayList<>();
 
-    // MÉTODOS HELPER 
+    // MÉTODOS HELPER (Pedido esta en relacion a itemPedido)
     public void agregarItemPedido(ItemPedido item) {
         if (this.itemsPedido == null) { 
             this.itemsPedido = new ArrayList<>();
@@ -59,4 +58,5 @@ public class Pedido {
             item.setPedido(null);
         }
     }
+
 }

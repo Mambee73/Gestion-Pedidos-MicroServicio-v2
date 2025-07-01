@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DireccionEnvioDTO {
+public class DireccionDTO {
 
     @NotBlank(message = "La calle no puede estar vacía.") 
     private String calle;
