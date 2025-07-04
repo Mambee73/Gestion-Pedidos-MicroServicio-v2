@@ -1,8 +1,7 @@
 package com.ecomarket.pedidos.models.dto;
 
 import com.ecomarket.pedidos.models.entity.EstadoPedido;
-
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SolicitudActualizarEstadoDTO {
-    @NotBlank(message = "El nuevo estado no puede estar vacío.")
+    @NotNull(message = "El nuevo estado no puede estar vacío.")
     private EstadoPedido nuevoEstado; 
 }
