@@ -1,18 +1,19 @@
 package com.ecomarket.pedidos.servicios;
 
-import com.ecomarket.pedidos.models.dto.*;
+import com.ecomarket.pedidos.assembler.PedidoModelAssembler;
+import com.ecomarket.pedidos.models.dto.RespuestaPedidoDTO;
+import com.ecomarket.pedidos.models.dto.RespuestaResumenPedidoDTO;
+import com.ecomarket.pedidos.models.dto.SolicitudCrearPedidoDTO;
+import com.ecomarket.pedidos.models.dto.SolicitudItemPedidoDTO;
 import com.ecomarket.pedidos.excepcion.ExcepcionPedidoNoEncontrado;
 import com.ecomarket.pedidos.models.entity.EstadoPedido;
 import com.ecomarket.pedidos.models.entity.ItemPedido;
 import com.ecomarket.pedidos.models.entity.Pedido;
 import com.ecomarket.pedidos.repositorios.RepositorioPedido;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,20 +23,21 @@ public class ServicioPedido {
     @Autowired
     private RepositorioPedido repositorioPedido;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    @Autowired
+    private PedidoModelAssembler pedidoModelAssembler;
 
     @Transactional
     public RespuestaPedidoDTO crearPedido(SolicitudCrearPedidoDTO solicitud) {
         Pedido pedidoNuevo = solicitudToEntidad(solicitud);
         Pedido pedidoGuardado = repositorioPedido.save(pedidoNuevo);
-        return entidadToRespuestaDTO(pedidoGuardado);
+        return pedidoModelAssembler.toModel(pedidoGuardado);
     }
 
     @Transactional(readOnly = true)
     public RespuestaPedidoDTO obtenerPedidoPorId(Long id) {
         Pedido pedido = repositorioPedido.findById(id)
                 .orElseThrow(() -> new ExcepcionPedidoNoEncontrado("Pedido no encontrado con ID: " + id));
-        return entidadToRespuestaDTO(pedido);
+        return pedidoModelAssembler.toModel(pedido);
     }
 
     @Transactional(readOnly = true)
@@ -52,7 +54,7 @@ public class ServicioPedido {
                 .orElseThrow(() -> new ExcepcionPedidoNoEncontrado("No se puede actualizar, pedido no encontrado con ID: " + id));
         pedidoExistente.setEstado(nuevoEstado);
         Pedido pedidoActualizado = repositorioPedido.save(pedidoExistente);
-        return entidadToRespuestaDTO(pedidoActualizado);
+        return pedidoModelAssembler.toModel(pedidoActualizado);
     }
 
     @Transactional
@@ -63,20 +65,21 @@ public class ServicioPedido {
         repositorioPedido.deleteById(id);
     }
 
-
-
-
+    @Transactional(readOnly = true)
+    public List<RespuestaResumenPedidoDTO> obtenerTodosLosPedidos() {
+        List<Pedido> pedidos = repositorioPedido.findAll();
+        return pedidos.stream()
+                .map(this::entidadToResumenDTO)
+                .collect(Collectors.toList());
+    }
 
     private Pedido solicitudToEntidad(SolicitudCrearPedidoDTO solicitud) {
         Pedido pedido = new Pedido();
         pedido.setClienteId(solicitud.getClienteId());
 
-        try {
-            if (solicitud.getDireccionEnvio() != null) {
-                pedido.setDireccionEnvioJson(objectMapper.writeValueAsString(solicitud.getDireccionEnvio()));
-            }
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException("Error al procesar la dirección de envío.", e);
+        if (solicitud.getDireccionEnvio() != null) {
+            pedido.setDireccionCalle(solicitud.getDireccionEnvio().getCalle());
+            pedido.setDireccionCiudad(solicitud.getDireccionEnvio().getCiudad());
         }
 
         long montoTotal = 0L;
@@ -87,11 +90,11 @@ public class ServicioPedido {
                 item.setCantidad(itemDto.getCantidad());
                 long precioTemporal = 5000L;
                 item.setPrecioAlComprar(precioTemporal);
-                item.setNombreProducto("Producto " + itemDto.getProductoId());
+                item.setNombreProducto("Producto Temporal " + itemDto.getProductoId());
                 long subTotal = precioTemporal * itemDto.getCantidad();
                 item.setSubTotal(subTotal);
                 montoTotal += subTotal;
-                pedido.agregarItemPedido(item); 
+                pedido.agregarItemPedido(item);
             }
         }
         
@@ -99,40 +102,6 @@ public class ServicioPedido {
         pedido.setEstado(EstadoPedido.PROCESANDO);
 
         return pedido;
-    }
-    
-    private RespuestaPedidoDTO entidadToRespuestaDTO(Pedido pedido) {
-        RespuestaPedidoDTO dto = new RespuestaPedidoDTO();
-        dto.setId(pedido.getId());
-        dto.setClienteId(pedido.getClienteId());
-        dto.setFechaPedido(pedido.getFechaPedido());
-        dto.setEstado(pedido.getEstado());
-        dto.setMontoTotal(pedido.getMontoTotal());
-        
-        try {
-            if (pedido.getDireccionEnvioJson() != null && !pedido.getDireccionEnvioJson().isEmpty()) {
-                dto.setDireccionEnvio(objectMapper.readValue(pedido.getDireccionEnvioJson(), DireccionDTO.class));
-            }
-        } catch (JsonProcessingException e) {
-            System.err.println("Error D" + pedido.getId());
-        }
-
-        if (pedido.getItemsPedido() != null) {
-            dto.setItems(pedido.getItemsPedido().stream().map(item -> {
-                RespuestaItemPedidoDTO itemDto = new RespuestaItemPedidoDTO();
-                itemDto.setId(item.getId());
-                itemDto.setProductoId(item.getProductoId());
-                itemDto.setNombreProducto(item.getNombreProducto());
-                itemDto.setCantidad(item.getCantidad());
-                itemDto.setPrecioAlComprar(item.getPrecioAlComprar());
-                itemDto.setSubTotal(item.getSubTotal());
-                return itemDto;
-            }).collect(Collectors.toList()));
-        } else {
-            dto.setItems(Collections.emptyList());
-        }
-
-        return dto;
     }
 
     private RespuestaResumenPedidoDTO entidadToResumenDTO(Pedido pedido) {

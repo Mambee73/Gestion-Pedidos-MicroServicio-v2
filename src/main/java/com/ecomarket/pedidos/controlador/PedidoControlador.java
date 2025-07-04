@@ -16,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/pedidos")
 public class PedidoControlador {
+
     @Autowired
     private ServicioPedido servicioPedido;
 
@@ -23,6 +24,12 @@ public class PedidoControlador {
     public ResponseEntity<RespuestaPedidoDTO> crearPedido(@Valid @RequestBody SolicitudCrearPedidoDTO solicitud) {
         RespuestaPedidoDTO pedidoCreado = servicioPedido.crearPedido(solicitud);
         return new ResponseEntity<>(pedidoCreado, HttpStatus.CREATED);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<RespuestaResumenPedidoDTO>> obtenerTodosLosPedidos() {
+        List<RespuestaResumenPedidoDTO> todosLosPedidos = servicioPedido.obtenerTodosLosPedidos();
+        return ResponseEntity.ok(todosLosPedidos);
     }
 
     @GetMapping("/{id}")
